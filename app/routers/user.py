@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import status, HTTPException, APIRouter
 from fastapi.params import Depends
 from sqlalchemy.orm.session import Session
@@ -28,4 +29,9 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
     if user.id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                 detail="cannot retrieve another user's information")       
-    return user        
+    return user
+
+@router.get("/", response_model=List[UserResponse])
+def get_all_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    return users;            
